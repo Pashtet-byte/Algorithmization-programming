@@ -1,46 +1,290 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace CompleteGenericsDemo
+namespace CompleteGenericsVarianceNullableDemo
 {
-    // ==================== РАЗДЕЛ 1: GENERICS (ЗАДАНИЯ 1-25) ====================
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("ПОЛНАЯ РЕАЛИЗАЦИЯ 100 ЗАДАЧ ПО GENERICS, VARIANCE, NULLABLE И NULL-COALESCING\n");
+
+            // Демонстрация Generics
+            Console.WriteLine("=== GENERICS ДЕМО (25 задач) ===");
+            DemoGenerics();
+
+            // Демонстрация Variance
+            Console.WriteLine("\n=== VARIANCE ДЕМО (25 задач) ===");
+            DemoVariance();
+
+            // Демонстрация Nullable
+            Console.WriteLine("\n=== NULLABLE ДЕМО (25 задач) ===");
+            DemoNullable();
+
+            // Демонстрация Null-coalescing
+            Console.WriteLine("\n=== NULL-COALESCING ДЕМО (25 задач) ===");
+            DemoNullCoalescing();
+
+            Console.WriteLine("\n=== ВСЕ 100 ЗАДАЧ ВЫПОЛНЕНЫ! ===");
+            Console.ReadLine();
+        }
+
+        static void DemoGenerics()
+        {
+            // Задание 1: Stack
+            Console.WriteLine("1. Stack<T>:");
+            var stack = new Stack<int>();
+            stack.Push(1); stack.Push(2); stack.Push(3);
+            stack.Display();
+            Console.WriteLine($"Pop: {stack.Pop()}");
+            stack.Display();
+
+            // Задание 2: Queue
+            Console.WriteLine("\n2. Queue<T>:");
+            var queue = new Queue<string>();
+            queue.Enqueue("A"); queue.Enqueue("B"); queue.Enqueue("C");
+            queue.Display();
+            Console.WriteLine($"Dequeue: {queue.Dequeue()}");
+            queue.Display();
+
+            // Задание 3: Array Search
+            Console.WriteLine("\n3. ArraySearch.FindIndex<T>:");
+            int[] numbers = { 1, 2, 3, 4, 5 };
+            int index = ArraySearch.FindIndex(numbers, 3);
+            Console.WriteLine($"Индекс элемента 3: {index}");
+
+            // Задание 4: Pair
+            Console.WriteLine("\n4. Pair<T>:");
+            var pair = new Pair<string>("Hello", "World");
+            Console.WriteLine($"Pair: {pair}");
+            pair.Swap();
+            Console.WriteLine($"После Swap: {pair}");
+
+            // Задание 5: Swap
+            Console.WriteLine("\n5. SwapHelper.Swap<T>:");
+            int x = 10, y = 20;
+            Console.WriteLine($"До Swap: x={x}, y={y}");
+            SwapHelper.Swap(ref x, ref y);
+            Console.WriteLine($"После Swap: x={x}, y={y}");
+
+            // Задание 6: Cache
+            Console.WriteLine("\n6. Cache<TKey, TValue>:");
+            var cache = new Cache<string, int>();
+            cache.Set("one", 1);
+            cache.Set("two", 2);
+            cache.Display();
+
+            // Задание 7: LinkedList
+            Console.WriteLine("\n7. LinkedList<T>:");
+            var linkedList = new LinkedList<int>();
+            linkedList.Add(1); linkedList.Add(2); linkedList.Add(3);
+            linkedList.Display();
+
+            // Задание 8: Sort
+            Console.WriteLine("\n8. SortHelper.BubbleSort<T>:");
+            int[] arrayToSort = { 5, 2, 8, 1, 9 };
+            SortHelper.BubbleSort(arrayToSort);
+            Console.WriteLine($"Отсортированный массив: [{string.Join(", ", arrayToSort)}]");
+
+            // Задание 9: Repository
+            Console.WriteLine("\n9. IRepository<T>:");
+            var userRepo = new Repository<User>();
+            userRepo.Add(new User { Name = "Alice" });
+            userRepo.Add(new User { Name = "Bob" });
+            Console.WriteLine($"Пользователь с ID 1: {userRepo.GetById(1)?.Name}");
+
+            // Задание 10: Matrix
+            Console.WriteLine("\n10. Matrix<T>:");
+            var matrix = new Matrix<int>(2, 3);
+            matrix[0, 0] = 1; matrix[0, 1] = 2; matrix[0, 2] = 3;
+            matrix[1, 0] = 4; matrix[1, 1] = 5; matrix[1, 2] = 6;
+            matrix.Display();
+
+            // Задание 15: MinMax
+            Console.WriteLine("\n15. MinMaxFinder.FindMinMax<T>:");
+            var (min, max) = MinMaxFinder.FindMinMax(new[] { 5, 2, 8, 1, 9 });
+            Console.WriteLine($"Min: {min}, Max: {max}");
+        }
+
+        static void DemoVariance()
+        {
+            // Задание 28: Ковариантность с IEnumerable
+            Console.WriteLine("28. Ковариантность IEnumerable:");
+            IEnumerable<Dog> dogs = new List<Dog> { new Dog { Name = "Rex" }, new Dog { Name = "Buddy" } };
+            IEnumerable<Animal> animals = dogs;
+            foreach (var animal1 in animals)
+                Console.WriteLine($"  {animal1.Name}");
+
+            // Задание 29: Контрвариантность с Action
+            Console.WriteLine("\n29. Контрвариантность Action:");
+            Action<Animal> animalAction = (animal) => Console.WriteLine($"Обработано: {animal.Name}");
+            Action<Dog> dogAction = animalAction;
+            dogAction(new Dog { Name = "Max" });
+
+            // Задание 30: Ковариантность с Func
+            Console.WriteLine("\n30. Ковариантность Func:");
+            Func<Dog> dogFactory = () => new Dog { Name = "Собака из фабрики" };
+            Func<Animal> animalFactory = dogFactory;
+            var createdAnimal = animalFactory();
+            Console.WriteLine($"Создано: {createdAnimal.Name}");
+
+            // Задание 31: Иерархия классов
+            Console.WriteLine("\n31. Иерархия Animal->Dog->Puppy:");
+            Animal animal = new Animal { Name = "Животное" };
+            Dog dog = new Dog { Name = "Собака" };
+            Puppy puppy = new Puppy { Name = "Щенок" };
+            animal.MakeSound();
+            dog.MakeSound();
+            puppy.MakeSound();
+
+            // Задание 32: Ошибки вариантности
+            Console.WriteLine("\n32. Ошибки вариантности:");
+            VarianceViolationDemo.ShowCompilationErrorExample();
+
+            // Задание 35: Ковариантность коллекций
+            Console.WriteLine("\n35. Ковариантность коллекций:");
+            CollectionVarianceDemo.Demo();
+
+            // Задание 39: Безопасное приведение
+            Console.WriteLine("\n39. Безопасное приведение:");
+            SafeCastingDemo.ProcessAsAnimal(new Dog { Name = "SafeDog" });
+
+            // Задание 46: Вариантность делегатов
+            Console.WriteLine("\n46. Вариантность делегатов:");
+            DelegateVarianceDemo.Demo();
+        }
+
+        static void DemoNullable()
+        {
+            // Задание 51: Nullable int
+            Console.WriteLine("51. Nullable int:");
+            NullableIntDemo.Demo();
+
+            // Задание 59: Nullable в свойствах
+            Console.WriteLine("\n59. UserProfile с nullable:");
+            var user = new UserProfile { Username = "john_doe", Age = null, Salary = 50000 };
+            Console.WriteLine(user.GetProfileInfo());
+
+            // Задание 60: Валидация
+            Console.WriteLine("\n60. Валидация nullable:");
+            var (isValid, error) = DataValidator.ValidateAge(25);
+            Console.WriteLine($"Валидация возраста 25: {isValid}, {error}");
+
+            // Задание 63: Преобразование null в default
+            Console.WriteLine("\n63. NullToDefaultConverter:");
+            NullToDefaultConverter.Demo();
+
+            // Задание 67: Nullable в LINQ
+            Console.WriteLine("\n67. Nullable в LINQ:");
+            NullableLinqDemo.Demo();
+
+            // Задание 68: Обработка исключений
+            Console.WriteLine("\n68. Обработка исключений nullable:");
+            int? nullValue = null;
+            int result = NullableExceptionHandler.SafeGetValue(nullValue, "Custom error message");
+            Console.WriteLine($"Результат с обработкой исключения: {result}");
+        }
+
+        static void DemoNullCoalescing()
+        {
+            // Задание 76: ?? для строк
+            Console.WriteLine("76. ?? для строк:");
+            StringNullCoalescing.Demo();
+
+            // Задание 80: ??= оператор
+            Console.WriteLine("\n80. ??= оператор:");
+            NullCoalescingAssignment.Demo();
+
+            // Задание 83: ?? с коллекциями
+            Console.WriteLine("\n83. ?? с коллекциями:");
+            CollectionNullCoalescing.Demo();
+
+            // Задание 84: ?? в LINQ
+            Console.WriteLine("\n84. ?? в LINQ:");
+            LinqNullCoalescing.Demo();
+
+            // Задание 89: Null-safe navigation
+            Console.WriteLine("\n89. Null-safe navigation:");
+            var company = new Company { Department = new Department { Manager = new Employee { Name = "Alice" } } };
+            Console.WriteLine($"Менеджер: {NullSafeNavigation.GetDeepValue(company)}");
+            var emptyCompany = new Company();
+            Console.WriteLine($"Менеджер (нет отдела): {NullSafeNavigation.GetDeepValue(emptyCompany)}");
+
+            // Задание 92: ?? с делегатами
+            Console.WriteLine("\n92. ?? с делегатами:");
+            DelegateNullCoalescing.SafeInvoke(() => Console.WriteLine("Делегат выполнен!"));
+            Action nullAction = null;
+            DelegateNullCoalescing.SafeInvoke(nullAction);
+
+            // Задание 94: ?? с конфигурацией
+            Console.WriteLine("\n94. ?? с конфигурацией:");
+            ConfigurationNullCoalescing.Demo();
+        }
+    }
+
+    // ==================== РАЗДЕЛ 1: GENERICS (25 задач) ====================
 
     // Задание 1: Generic класс Stack
     public class Stack<T>
     {
         private List<T> _items = new List<T>();
-        public void Push(T item) => _items.Add(item);
+
+        public void Push(T item)
+        {
+            _items.Add(item);
+            Console.WriteLine($"Добавлен: {item}");
+        }
+
         public T Pop()
         {
             if (_items.Count == 0) throw new InvalidOperationException("Стек пуст");
             var item = _items[^1];
             _items.RemoveAt(_items.Count - 1);
+            Console.WriteLine($"Извлечен: {item}");
             return item;
         }
-        public T Peek() => _items.Count == 0 ? throw new InvalidOperationException("Стек пуст") : _items[^1];
+
+        public T Peek()
+        {
+            if (_items.Count == 0) throw new InvalidOperationException("Стек пуст");
+            return _items[^1];
+        }
+
         public int Count => _items.Count;
+
         public void Display() => Console.WriteLine($"Стек: [{string.Join(", ", _items)}]");
-        public void Clear() => _items.Clear();
     }
 
     // Задание 2: Generic класс Queue
     public class Queue<T>
     {
         private List<T> _items = new List<T>();
-        public void Enqueue(T item) => _items.Add(item);
+
+        public void Enqueue(T item)
+        {
+            _items.Add(item);
+            Console.WriteLine($"Добавлен в очередь: {item}");
+        }
+
         public T Dequeue()
         {
             if (_items.Count == 0) throw new InvalidOperationException("Очередь пуста");
             var item = _items[0];
             _items.RemoveAt(0);
+            Console.WriteLine($"Извлечен из очереди: {item}");
             return item;
         }
-        public T Peek() => _items.Count == 0 ? throw new InvalidOperationException("Очередь пуста") : _items[0];
+
+        public T Peek()
+        {
+            if (_items.Count == 0) throw new InvalidOperationException("Очередь пуста");
+            return _items[0];
+        }
+
         public int Count => _items.Count;
+
         public void Display() => Console.WriteLine($"Очередь: [{string.Join(", ", _items)}]");
-        public void Clear() => _items.Clear();
     }
 
     // Задание 3: Generic метод для поиска в массиве
@@ -59,26 +303,46 @@ namespace CompleteGenericsDemo
     {
         public T First { get; set; }
         public T Second { get; set; }
-        public Pair(T first, T second) { First = first; Second = second; }
+
+        public Pair(T first, T second)
+        {
+            First = first;
+            Second = second;
+        }
+
         public override string ToString() => $"({First}, {Second})";
+
         public void Swap() => (First, Second) = (Second, First);
     }
 
     // Задание 5: Generic метод для обмена значений
     public static class SwapHelper
     {
-        public static void Swap<T>(ref T a, ref T b) => (a, b) = (b, a);
-        public static (T, T) SwapAndReturn<T>(T a, T b) => (b, a);
+        public static void Swap<T>(ref T a, ref T b)
+        {
+            T temp = a;
+            a = b;
+            b = temp;
+        }
     }
 
     // Задание 6: Generic класс Cache
     public class Cache<TKey, TValue>
     {
         private Dictionary<TKey, TValue> _storage = new Dictionary<TKey, TValue>();
+
         public void Set(TKey key, TValue value) => _storage[key] = value;
+
         public TValue Get(TKey key) => _storage.TryGetValue(key, out TValue value) ? value : default;
+
         public bool Contains(TKey key) => _storage.ContainsKey(key);
-        public void Clear() => _storage.Clear();
+
+        public void Display()
+        {
+            Console.WriteLine("Cache contents:");
+            foreach (var kvp in _storage)
+                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+        }
     }
 
     // Задание 7: Generic класс LinkedList
@@ -90,7 +354,9 @@ namespace CompleteGenericsDemo
             public Node Next { get; set; }
             public Node(T data) => Data = data;
         }
+
         public Node Head { get; private set; }
+
         public void Add(T data)
         {
             var newNode = new Node(data);
@@ -102,11 +368,16 @@ namespace CompleteGenericsDemo
                 current.Next = newNode;
             }
         }
+
         public void Display()
         {
             var current = Head;
             var items = new List<T>();
-            while (current != null) { items.Add(current.Data); current = current.Next; }
+            while (current != null)
+            {
+                items.Add(current.Data);
+                current = current.Next;
+            }
             Console.WriteLine($"Список: [{string.Join(" -> ", items)}]");
         }
     }
@@ -121,6 +392,7 @@ namespace CompleteGenericsDemo
                     if (array[j].CompareTo(array[j + 1]) > 0)
                         Swap(ref array[j], ref array[j + 1]);
         }
+
         private static void Swap<T>(ref T a, ref T b) => (a, b) = (b, a);
     }
 
@@ -130,14 +402,53 @@ namespace CompleteGenericsDemo
         void Add(T entity);
         T GetById(int id);
         IEnumerable<T> GetAll();
+        void Update(T entity);
+        void Delete(int id);
     }
 
-    public class Repository<T> : IRepository<T> where T : class
+    // Базовый класс с Id для репозитория
+    public abstract class Entity
+    {
+        public int Id { get; set; }
+    }
+
+    public class User : Entity
+    {
+        public string Name { get; set; }
+        public override string ToString() => $"User: {Name} (ID: {Id})";
+    }
+
+    public class Repository<T> : IRepository<T> where T : Entity, new()
     {
         private List<T> _entities = new List<T>();
-        public void Add(T entity) => _entities.Add(entity);
-        public T GetById(int id) => id >= 0 && id < _entities.Count ? _entities[id] : null;
+        private int _nextId = 1;
+
+        public void Add(T entity)
+        {
+            entity.Id = _nextId++;
+            _entities.Add(entity);
+        }
+
+        public T GetById(int id) => _entities.FirstOrDefault(e => e.Id == id);
+
         public IEnumerable<T> GetAll() => _entities;
+
+        public void Update(T entity)
+        {
+            var existing = GetById(entity.Id);
+            if (existing != null)
+            {
+                var index = _entities.IndexOf(existing);
+                _entities[index] = entity;
+            }
+        }
+
+        public void Delete(int id)
+        {
+            var entity = GetById(id);
+            if (entity != null)
+                _entities.Remove(entity);
+        }
     }
 
     // Задание 10: Generic класс Matrix
@@ -146,12 +457,20 @@ namespace CompleteGenericsDemo
         private T[,] _matrix;
         public int Rows { get; }
         public int Columns { get; }
-        public Matrix(int rows, int columns) { Rows = rows; Columns = columns; _matrix = new T[rows, columns]; }
+
+        public Matrix(int rows, int columns)
+        {
+            Rows = rows;
+            Columns = columns;
+            _matrix = new T[rows, columns];
+        }
+
         public T this[int row, int col]
         {
             get => _matrix[row, col];
             set => _matrix[row, col] = value;
         }
+
         public void Display()
         {
             for (int i = 0; i < Rows; i++)
@@ -173,22 +492,37 @@ namespace CompleteGenericsDemo
     // Задание 12: Generic класс History
     public class History<T>
     {
-        private Stack<T> _history = new Stack<T>();
-        private Stack<T> _future = new Stack<T>();
-        public void Add(T item) { _history.Push(item); _future.Clear(); }
+        private List<T> _history = new List<T>();
+        private List<T> _future = new List<T>();
+
+        public void Add(T item)
+        {
+            _history.Add(item);
+            _future.Clear();
+        }
+
         public T Undo()
         {
             if (_history.Count == 0) return default;
-            var item = _history.Pop();
-            _future.Push(item);
+            var item = _history[^1];
+            _history.RemoveAt(_history.Count - 1);
+            _future.Insert(0, item);
             return item;
         }
+
         public T Redo()
         {
             if (_future.Count == 0) return default;
-            var item = _future.Pop();
-            _history.Push(item);
+            var item = _future[0];
+            _future.RemoveAt(0);
+            _history.Add(item);
             return item;
+        }
+
+        public void Display()
+        {
+            Console.WriteLine($"История: [{string.Join(", ", _history)}]");
+            Console.WriteLine($"Будущее: [{string.Join(", ", _future)}]");
         }
     }
 
@@ -203,13 +537,23 @@ namespace CompleteGenericsDemo
     public class Graph<T> where T : IEquatable<T>
     {
         private Dictionary<T, List<T>> _adjacencyList = new Dictionary<T, List<T>>();
+
         public void AddVertex(T vertex) => _adjacencyList[vertex] = new List<T>();
+
         public void AddEdge(T source, T destination)
         {
             if (!_adjacencyList.ContainsKey(source)) AddVertex(source);
             if (!_adjacencyList.ContainsKey(destination)) AddVertex(destination);
             _adjacencyList[source].Add(destination);
             _adjacencyList[destination].Add(source);
+        }
+
+        public void Display()
+        {
+            foreach (var vertex in _adjacencyList)
+            {
+                Console.WriteLine($"{vertex.Key}: [{string.Join(", ", vertex.Value)}]");
+            }
         }
     }
 
@@ -219,12 +563,16 @@ namespace CompleteGenericsDemo
         public static (T min, T max) FindMinMax<T>(IEnumerable<T> collection) where T : IComparable<T>
         {
             if (!collection.Any()) throw new ArgumentException("Коллекция пуста");
-            T min = collection.First(), max = collection.First();
+
+            T min = collection.First();
+            T max = collection.First();
+
             foreach (var item in collection)
             {
                 if (item.CompareTo(min) < 0) min = item;
                 if (item.CompareTo(max) > 0) max = item;
             }
+
             return (min, max);
         }
     }
@@ -233,8 +581,16 @@ namespace CompleteGenericsDemo
     public class Container<T> where T : class, new()
     {
         private T _item = new T();
-        public T Item { get => _item; set => _item = value ?? throw new ArgumentNullException(); }
+
+        public T Item
+        {
+            get => _item;
+            set => _item = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
         public void Reset() => _item = new T();
+
+        public void Display() => Console.WriteLine($"Container: {_item}");
     }
 
     // Задание 17: Generic метод для обхода дерева
@@ -242,7 +598,9 @@ namespace CompleteGenericsDemo
     {
         public T Data { get; set; }
         public List<TreeNode<T>> Children { get; set; } = new List<TreeNode<T>>();
+
         public TreeNode(T data) => Data = data;
+
         public void AddChild(TreeNode<T> child) => Children.Add(child);
     }
 
@@ -251,8 +609,19 @@ namespace CompleteGenericsDemo
         public static void Traverse<T>(TreeNode<T> root, Action<T> action)
         {
             if (root == null) return;
+
             action(root.Data);
-            foreach (var child in root.Children) Traverse(child, action);
+            foreach (var child in root.Children)
+                Traverse(child, action);
+        }
+
+        public static void DisplayTree<T>(TreeNode<T> root, int level = 0)
+        {
+            if (root == null) return;
+
+            Console.WriteLine($"{new string(' ', level * 2)}{root.Data}");
+            foreach (var child in root.Children)
+                DisplayTree(child, level + 1);
         }
     }
 
@@ -262,12 +631,20 @@ namespace CompleteGenericsDemo
         int Compare(T x, T y);
     }
 
+    public class IntComparer : IGenericComparer<int>
+    {
+        public int Compare(int x, int y) => x.CompareTo(y);
+    }
+
     // Задание 19: Generic класс EventDispatcher
     public class EventDispatcher<T>
     {
         private event Action<T> OnEvent;
+
         public void Subscribe(Action<T> handler) => OnEvent += handler;
+
         public void Unsubscribe(Action<T> handler) => OnEvent -= handler;
+
         public void Dispatch(T eventData) => OnEvent?.Invoke(eventData);
     }
 
@@ -281,7 +658,9 @@ namespace CompleteGenericsDemo
     public class Converter<TIn, TOut>
     {
         private readonly Func<TIn, TOut> _conversionFunction;
+
         public Converter(Func<TIn, TOut> conversionFunction) => _conversionFunction = conversionFunction;
+
         public TOut Convert(TIn input) => _conversionFunction(input);
     }
 
@@ -295,7 +674,9 @@ namespace CompleteGenericsDemo
     public class Handler<TRequest, TResponse>
     {
         private readonly Func<TRequest, TResponse> _handleFunction;
+
         public Handler(Func<TRequest, TResponse> handleFunction) => _handleFunction = handleFunction;
+
         public TResponse Handle(TRequest request) => _handleFunction(request);
     }
 
@@ -303,28 +684,64 @@ namespace CompleteGenericsDemo
     public static class TypeGrouper
     {
         public static Dictionary<Type, List<object>> GroupByType(IEnumerable<object> items)
-            => items.GroupBy(item => item.GetType()).ToDictionary(g => g.Key, g => g.ToList());
+            => items.GroupBy(item => item.GetType())
+                   .ToDictionary(g => g.Key, g => g.ToList());
     }
 
     // Задание 25: Generic класс Pipeline
     public class Pipeline<T>
     {
         private List<Func<T, T>> _stages = new List<Func<T, T>>();
-        public Pipeline<T> AddStage(Func<T, T> stage) { _stages.Add(stage); return this; }
+
+        public Pipeline<T> AddStage(Func<T, T> stage)
+        {
+            _stages.Add(stage);
+            return this;
+        }
+
         public T Execute(T input)
         {
             T result = input;
-            foreach (var stage in _stages) result = stage(result);
+            foreach (var stage in _stages)
+                result = stage(result);
             return result;
         }
     }
 
-    // ==================== РАЗДЕЛ 2: VARIANCE (ЗАДАНИЯ 26-50) ====================
+    // ==================== РАЗДЕЛ 2: VARIANCE (25 задач) ====================
+
+    // Базовые классы для иерархии
+    public class Animal
+    {
+        public string Name { get; set; }
+        public virtual void MakeSound() => Console.WriteLine("Звук животного");
+        public override string ToString() => Name;
+    }
+
+    public class Dog : Animal
+    {
+        public override void MakeSound() => Console.WriteLine("Гав! Гав!");
+    }
+
+    public class Puppy : Dog
+    {
+        public override void MakeSound() => Console.WriteLine("Пищик! Пищик!");
+    }
 
     // Задание 26: Ковариантный интерфейс IProducer
     public interface IProducer<out T>
     {
         T Produce();
+    }
+
+    public class AnimalProducer : IProducer<Animal>
+    {
+        public Animal Produce() => new Animal { Name = "Generic Animal" };
+    }
+
+    public class DogProducer : IProducer<Dog>
+    {
+        public Dog Produce() => new Dog { Name = "Buddy" };
     }
 
     // Задание 27: Контрвариантный интерфейс IConsumer
@@ -333,36 +750,27 @@ namespace CompleteGenericsDemo
         void Consume(T item);
     }
 
-    // Задание 28: Пример ковариантности с IEnumerable
-    public class Animal { public string Name { get; set; } }
-    public class Dog : Animal { }
-    public class Puppy : Dog { }
-
-    // Задание 29: Контрвариантный делегат Action
-    public class ContravarianceDemo
+    public class AnimalConsumer : IConsumer<Animal>
     {
-        public static void RegisterAnimalHandler(Action<Animal> handler) => handler(new Animal { Name = "Тест" });
-    }
-
-    // Задание 30: Ковариантный делегат Func
-    public class FuncCovarianceDemo
-    {
-        public static void UseAnimalFactory(Func<Animal> factory) => Console.WriteLine($"Создано: {factory().Name}");
-    }
-
-    // Задание 31: Иерархия классов для демонстрации вариантности
-    public class AnimalHierarchy
-    {
-        public static void Demo()
+        public void Consume(Animal animal)
         {
-            Animal animal = new Animal { Name = "Животное" };
-            Dog dog = new Dog { Name = "Собака" };
-            Puppy puppy = new Puppy { Name = "Щенок" };
+            Console.WriteLine($"Потребление: {animal.Name}");
+            animal.MakeSound();
         }
     }
 
     // Задание 32: Пример ошибки при нарушении правил вариантности
-    // public interface IViolation<in T> { T GetItem(); } // Ошибка компиляции
+    public class VarianceViolationDemo
+    {
+        public static void ShowCompilationErrorExample()
+        {
+            Console.WriteLine("Следующий код вызовет ошибки компиляции:");
+            Console.WriteLine("List<Dog> dogs = new List<Dog>();");
+            Console.WriteLine("List<Animal> animals = dogs; // CS0029");
+            Console.WriteLine("IList<Animal> animals = dogs; // CS0266");
+            Console.WriteLine("Ковариантность работает только для интерфейсов с out параметрами");
+        }
+    }
 
     // Задание 33: Generic интерфейс с ковариантными параметрами
     public interface IReadOnlyRepository<out T>
@@ -371,19 +779,48 @@ namespace CompleteGenericsDemo
         IEnumerable<T> GetAll();
     }
 
+    public class AnimalRepository : IReadOnlyRepository<Animal>
+    {
+        private List<Animal> _animals = new List<Animal>
+        {
+            new Animal { Name = "Animal1" },
+            new Dog { Name = "Dog1" },
+            new Puppy { Name = "Puppy1" }
+        };
+
+        public Animal GetById(int id) => id < _animals.Count ? _animals[id] : null;
+        public IEnumerable<Animal> GetAll() => _animals;
+    }
+
     // Задание 34: Контрвариантный компаратор
     public interface IGenericComparerContravariant<in T>
     {
         int Compare(T x, T y);
     }
 
-    // Задание 35: Пример ковариантности с коллекциями
+    public class AnimalComparer : IGenericComparerContravariant<Animal>
+    {
+        public int Compare(Animal x, Animal y) => string.Compare(x?.Name, y?.Name);
+    }
+
+    // Задание 35: Пример ковариантности при работе с коллекциями
     public class CollectionVarianceDemo
     {
         public static void Demo()
         {
-            IEnumerable<Dog> dogs = new List<Dog> { new Dog { Name = "Rex" } };
-            IEnumerable<Animal> animals = dogs; // Ковариантность
+            List<Dog> dogs = new List<Dog> { new Dog { Name = "Rex" }, new Dog { Name = "Buddy" } };
+            List<Puppy> puppies = new List<Puppy> { new Puppy { Name = "Max" }, new Puppy { Name = "Charlie" } };
+
+            IEnumerable<Animal> animalsFromDogs = dogs;
+            IEnumerable<Animal> animalsFromPuppies = puppies;
+
+            Console.WriteLine("Животные из собак:");
+            foreach (var animal in animalsFromDogs)
+                Console.WriteLine($"  - {animal.Name}");
+
+            Console.WriteLine("Животные из щенков:");
+            foreach (var animal in animalsFromPuppies)
+                Console.WriteLine($"  - {animal.Name}");
         }
     }
 
@@ -403,7 +840,7 @@ namespace CompleteGenericsDemo
 
     public class DogFactory : IAnimalFactory<Dog>
     {
-        public Dog Create() => new Dog { Name = "Собака" };
+        public Dog Create() => new Dog { Name = "Собака из фабрики" };
     }
 
     // Задание 38: Контрвариантный обработчик EventHandler
@@ -412,26 +849,52 @@ namespace CompleteGenericsDemo
         void Handle(TEvent @event);
     }
 
+    public class AnimalEventHandler : IEventHandler<Animal>
+    {
+        public void Handle(Animal @event)
+        {
+            Console.WriteLine($"Обработка события: {@event.Name}");
+        }
+    }
+
     // Задание 39: Пример безопасного приведения типов
     public class SafeCastingDemo
     {
         public static void ProcessAsAnimal<T>(T animal) where T : Animal
         {
-            Animal baseAnimal = animal; // Безопасное приведение
+            Animal baseAnimal = animal;
+            Console.WriteLine($"Безопасно приведено к Animal: {baseAnimal.Name}");
         }
     }
 
     // Задание 40: Интерфейс Repository с ковариантностью
-    public interface ICovariantRepository<out T>
+    public interface ICovariantRepository<out T> where T : Animal
     {
         T Get(int id);
         IEnumerable<T> GetAll();
     }
 
+    public class CovariantAnimalRepository : ICovariantRepository<Animal>
+    {
+        private List<Animal> _animals = new List<Animal>
+        {
+            new Animal { Name = "CovariantAnimal1" },
+            new Dog { Name = "CovariantDog1" }
+        };
+
+        public Animal Get(int id) => id < _animals.Count ? _animals[id] : null;
+        public IEnumerable<Animal> GetAll() => _animals;
+    }
+
     // Задание 41: Контрвариантный validator
-    public interface IValidator<in T>
+    public interface IValidatorContravariant<in T>
     {
         bool Validate(T item);
+    }
+
+    public class AnimalValidator : IValidatorContravariant<Animal>
+    {
+        public bool Validate(Animal item) => item != null && !string.IsNullOrEmpty(item.Name);
     }
 
     // Задание 42: Комбинирование ковариантности и контрвариантности
@@ -440,12 +903,21 @@ namespace CompleteGenericsDemo
         TOutput Process(TInput input);
     }
 
+    public class AnimalProcessor : IProcessor<Dog, Animal>
+    {
+        public Animal Process(Dog input) => new Animal { Name = $"Обработанный {input.Name}" };
+    }
+
     // Задание 43: Generic метод с ограничениями для вариантности
     public class VarianceConstraints
     {
         public static void ProcessProducers<T>(IEnumerable<IProducer<T>> producers) where T : Animal
         {
-            foreach (var producer in producers) producer.Produce();
+            foreach (var producer in producers)
+            {
+                var product = producer.Produce();
+                Console.WriteLine($"  Произведено: {product.Name}");
+            }
         }
     }
 
@@ -454,6 +926,26 @@ namespace CompleteGenericsDemo
     {
         T Current { get; }
         bool MoveNext();
+        void Reset();
+    }
+
+    public class AnimalIterator : IIterator<Animal>
+    {
+        private List<Animal> _animals;
+        private int _position = -1;
+
+        public AnimalIterator(IEnumerable<Animal> animals)
+        {
+            _animals = animals.ToList();
+        }
+
+        public Animal Current => _position >= 0 && _position < _animals.Count ? _animals[_position] : null;
+        public bool MoveNext()
+        {
+            _position++;
+            return _position < _animals.Count;
+        }
+        public void Reset() => _position = -1;
     }
 
     // Задание 45: Контрвариантный интерфейс для обработки ошибок
@@ -462,13 +954,27 @@ namespace CompleteGenericsDemo
         void HandleError(TError error);
     }
 
+    public class AnimalErrorHandler : IErrorHandler<Animal>
+    {
+        public void HandleError(Animal error)
+        {
+            Console.WriteLine($"Обработка ошибки с животным: {error.Name}");
+        }
+    }
+
     // Задание 46: Пример вариантности в делегатах
     public class DelegateVarianceDemo
     {
         public static void Demo()
         {
-            Func<Dog> dogFactory = () => new Dog();
-            Func<Animal> animalFactory = dogFactory; // Ковариантность
+            Action<Animal> animalAction = (animal) => Console.WriteLine($"Действие с животным: {animal.Name}");
+            Action<Dog> dogAction = animalAction;
+            dogAction(new Dog { Name = "DelegateDog" });
+
+            Func<Dog> dogFactory = () => new Dog { Name = "Собака из фабрики" };
+            Func<Animal> animalFactory = dogFactory;
+            var animal = animalFactory();
+            Console.WriteLine($"Создано через ковариантный делегат: {animal.Name}");
         }
     }
 
@@ -486,12 +992,21 @@ namespace CompleteGenericsDemo
         TOutput Transform(TInput input);
     }
 
+    public class AnimalToDogTransformer : ITransformer<Animal, Dog>
+    {
+        public Dog Transform(Animal input) => new Dog { Name = $"Трансформировано: {input.Name}" };
+    }
+
     // Задание 49: Система типов с поддержкой ковариантности
     public class TypeSystemWithVariance
     {
         public static void ProcessAnimalProducers(IEnumerable<IProducer<Animal>> producers)
         {
-            foreach (var producer in producers) producer.Produce();
+            foreach (var producer in producers)
+            {
+                var animal = producer.Produce();
+                Console.WriteLine($"  Произведено животное: {animal.Name}");
+            }
         }
     }
 
@@ -499,9 +1014,22 @@ namespace CompleteGenericsDemo
     public interface IVariantRepository<in TKey, out TValue>
     {
         TValue Get(TKey key);
+        IEnumerable<TValue> GetAll();
     }
 
-    // ==================== РАЗДЕЛ 3: NULLABLE TYPES (ЗАДАНИЯ 51-75) ====================
+    public class AnimalVariantRepository : IVariantRepository<string, Animal>
+    {
+        private Dictionary<string, Animal> _animals = new Dictionary<string, Animal>
+        {
+            ["dog1"] = new Dog { Name = "VariantDog1" },
+            ["animal1"] = new Animal { Name = "VariantAnimal1" }
+        };
+
+        public Animal Get(string key) => _animals.TryGetValue(key, out var animal) ? animal : null;
+        public IEnumerable<Animal> GetAll() => _animals.Values;
+    }
+
+    // ==================== РАЗДЕЛ 3: NULLABLE TYPES (25 задач) ====================
 
     // Задание 51: Nullable тип int?
     public class NullableIntDemo
@@ -571,10 +1099,11 @@ namespace CompleteGenericsDemo
         public bool HasValue => _hasValue;
         public T Value => _hasValue ? _value : throw new InvalidOperationException("Значение отсутствует");
         public T GetValueOrDefault(T defaultValue = default) => _hasValue ? _value : defaultValue;
+        public override string ToString() => _hasValue ? _value.ToString() : "[No Value]";
     }
 
     // Задание 58: Методы Equals и GetHashCode для nullable типов
-    public static class NullableComparer
+    public static class NullableComparerHelper
     {
         public static bool AreEqual<T>(T? first, T? second) where T : struct, IEquatable<T>
         {
@@ -590,7 +1119,9 @@ namespace CompleteGenericsDemo
         public string Username { get; set; }
         public int? Age { get; set; }
         public decimal? Salary { get; set; }
-        public string GetProfileInfo() => $"Пользователь: {Username}, Возраст: {Age?.ToString() ?? "не указан"}";
+
+        public string GetProfileInfo() =>
+            $"Пользователь: {Username}, Возраст: {Age?.ToString() ?? "не указан"}, Зарплата: {Salary?.ToString("C") ?? "не указана"}";
     }
 
     // Задание 60: Валидация данных с использованием nullable типов
@@ -598,7 +1129,9 @@ namespace CompleteGenericsDemo
     {
         public static (bool isValid, string error) ValidateAge(int? age)
         {
-            if (!age.HasValue) return (false, "Возраст обязателен");
+            if (!age.HasValue)
+                return (false, "Возраст обязателен");
+
             return (age >= 0 && age <= 150, "Возраст должен быть от 0 до 150");
         }
     }
@@ -616,12 +1149,28 @@ namespace CompleteGenericsDemo
         private List<T?> _items = new List<T?>();
         public void Add(T? item) => _items.Add(item);
         public IEnumerable<T> GetNonNullValues() => _items.Where(item => item.HasValue).Select(item => item.Value);
+        public void Display()
+        {
+            Console.WriteLine($"Коллекция: [{string.Join(", ", _items.Select(i => i?.ToString() ?? "null"))}]");
+        }
     }
 
     // Задание 63: Пример преобразования null в значение по умолчанию
     public static class NullToDefaultConverter
     {
         public static T ConvertNullToDefault<T>(T? nullable) where T : struct => nullable ?? default;
+        public static T ConvertNullToDefaultClass<T>(T value, T defaultValue) where T : class => value ?? defaultValue;
+
+        public static void Demo()
+        {
+            int? nullInt = null;
+            int result = ConvertNullToDefault(nullInt);
+            Console.WriteLine($"null int -> default: {result}");
+
+            string nullString = null;
+            string stringResult = ConvertNullToDefaultClass(nullString, "DefaultString");
+            Console.WriteLine($"null string -> default: '{stringResult}'");
+        }
     }
 
     // Задание 64: Система для работы с опциональными параметрами
@@ -656,9 +1205,13 @@ namespace CompleteGenericsDemo
     {
         public static void Demo()
         {
-            var numbers = new int?[] { 1, null, 3, null, 5 };
+            var numbers = new int?[] { 1, null, 3, null, 5, 7, null, 9 };
             var nonNullNumbers = numbers.Where(n => n.HasValue).Select(n => n.Value);
             Console.WriteLine($"Не-null числа: [{string.Join(", ", nonNullNumbers)}]");
+
+            var nullCount = numbers.Count(n => !n.HasValue);
+            var nonNullCount = numbers.Count(n => n.HasValue);
+            Console.WriteLine($"Null значений: {nullCount}, Не-null: {nonNullCount}");
         }
     }
 
@@ -731,7 +1284,7 @@ namespace CompleteGenericsDemo
         public void Set(TKey key, TValue? value) => _cache[key] = value;
     }
 
-    // ==================== РАЗДЕЛ 4: NULL-COALESCING (ЗАДАНИЯ 76-100) ====================
+    // ==================== РАЗДЕЛ 4: NULL-COALESCING (25 задач) ====================
 
     // Задание 76: Оператор ?? для строк
     public static class StringNullCoalescing
@@ -755,7 +1308,7 @@ namespace CompleteGenericsDemo
     public static class ChainNullCoalescing
     {
         public static T FirstNonNull<T>(params T[] values) where T : class
-            => values.FirstOrDefault(value => value != null);
+            => values.FirstOrDefault(value => value != null) ?? (values.Length > 0 ? values[0] : default);
     }
 
     // Задание 79: Метод для получения первого не-null значения
@@ -773,6 +1326,9 @@ namespace CompleteGenericsDemo
             string text = null;
             text ??= "Default Text";
             Console.WriteLine($"text: {text}");
+
+            text ??= "Another Text";
+            Console.WriteLine($"text после второго ??=: {text}");
         }
     }
 
@@ -793,6 +1349,13 @@ namespace CompleteGenericsDemo
     public static class CollectionNullCoalescing
     {
         public static IEnumerable<T> GetSafeCollection<T>(IEnumerable<T> collection) => collection ?? Enumerable.Empty<T>();
+
+        public static void Demo()
+        {
+            List<string> nullList = null;
+            var safeList = GetSafeCollection(nullList);
+            Console.WriteLine($"Безопасная коллекция: [{string.Join(", ", safeList)}]");
+        }
     }
 
     // Задание 84: Пример ?? в LINQ выражениях
@@ -800,7 +1363,11 @@ namespace CompleteGenericsDemo
     {
         public static void Demo()
         {
-            var users = new[] { new { Name = "Alice", Age = (int?)25 }, new { Name = "Bob", Age = (int?)null } };
+            var users = new[]
+            {
+                new { Name = "Alice", Age = (int?)25 },
+                new { Name = "Bob", Age = (int?)null }
+            };
             var namesWithAge = users.Select(u => $"{u.Name} ({(u.Age?.ToString() ?? "Unknown")})");
             Console.WriteLine($"Пользователи: {string.Join(", ", namesWithAge)}");
         }
@@ -812,7 +1379,12 @@ namespace CompleteGenericsDemo
         public static string GetProductName(Product product) => product?.Name ?? "Unnamed Product";
     }
 
-    public class Product { public string Name { get; set; } public decimal Price { get; set; } }
+    public class Product
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public override string ToString() => $"{Name} - ${Price:F2}";
+    }
 
     // Задание 86: Метод для установки значения свойства если null
     public static class PropertyNullCoalescing
@@ -831,7 +1403,8 @@ namespace CompleteGenericsDemo
     public static class ParsingNullCoalescing
     {
         public static int? SafeParseInt(string input) => int.TryParse(input, out int result) ? result : (int?)null;
-        public static int ParseIntWithFallback(string input, int fallback = 0) => int.TryParse(input, out int result) ? result : fallback;
+        public static int ParseIntWithFallback(string input, int fallback = 0) =>
+            int.TryParse(input, out int result) ? result : fallback;
     }
 
     // Задание 89: Цепочка вызовов с ?? (null-safe navigation)
@@ -857,67 +1430,94 @@ namespace CompleteGenericsDemo
         public static void ProcessItems(IEnumerable<string> items, string defaultItem = "default")
         {
             var safeItems = items ?? new[] { defaultItem };
-            foreach (var item in safeItems) Console.WriteLine($"Обработка: {item}");
+            Console.WriteLine($"Обработка элементов: [{string.Join(", ", safeItems)}]");
         }
     }
 
     // Задание 92: Пример ?? с методом Invoke на делегатах
     public static class DelegateNullCoalescing
     {
-        public static void SafeInvoke(Action action, Action defaultAction = null)
-            => (action ?? defaultAction ?? (() => Console.WriteLine("No action")))?.Invoke();
+        public static void SafeInvoke(Action action) => action?.Invoke();
+        public static TResult SafeInvoke<TResult>(Func<TResult> func, TResult defaultValue = default)
+            => func != null ? func() : defaultValue;
     }
 
     // Задание 93: Обработка null в асинхронных методах через ??
     public static class AsyncNullCoalescing
     {
-        public static async Task<string> GetDataAsync(string source, string fallbackSource)
+        public static async System.Threading.Tasks.Task<string> GetDataAsync()
         {
-            await Task.Delay(100);
-            return source ?? fallbackSource ?? "Default Data";
+            await System.Threading.Tasks.Task.Delay(100);
+            return null;
+        }
+
+        public static async System.Threading.Tasks.Task DemoAsync()
+        {
+            var data = await GetDataAsync() ?? "Default Async Data";
+            Console.WriteLine($"Асинхронные данные: {data}");
         }
     }
 
     // Задание 94: Пример ?? при работе с конфигурацией
     public static class ConfigurationNullCoalescing
     {
-        public class AppConfig { public string DatabaseConnection { get; set; } public int? Timeout { get; set; } }
-        public static AppConfig GetSafeConfig(AppConfig userConfig, AppConfig defaultConfig) => new AppConfig
+        public class AppConfig
         {
-            DatabaseConnection = userConfig?.DatabaseConnection ?? defaultConfig?.DatabaseConnection ?? "Default",
-            Timeout = userConfig?.Timeout ?? defaultConfig?.Timeout ?? 30
-        };
+            public string DatabaseConnection { get; set; }
+            public int? Timeout { get; set; }
+            public string LogLevel { get; set; }
+        }
+
+        public static void Demo()
+        {
+            AppConfig config = null;
+            var connection = config?.DatabaseConnection ?? "DefaultConnection";
+            var timeout = config?.Timeout ?? 30;
+            var logLevel = config?.LogLevel ?? "INFO";
+            Console.WriteLine($"Конфигурация: Connection={connection}, Timeout={timeout}, LogLevel={logLevel}");
+        }
     }
 
     // Задание 95: Использование ?? для установки значений по умолчанию
-    public static class DefaultValueSetter
+    public static class DefaultValueNullCoalescing
     {
-        public static T SetDefaultIfNull<T>(T value, T defaultValue) where T : class => value ?? defaultValue;
+        public static T WithDefault<T>(T value, T defaultValue) where T : class => value ?? defaultValue;
+        public static string EnsureNotNull(string value) => value ?? string.Empty;
     }
 
     // Задание 96: Метод для преобразования null в пустую коллекцию
-    public static class EmptyCollectionConverter
+    public static class EmptyCollectionNullCoalescing
     {
-        public static IEnumerable<T> AsEmptyIfNull<T>(IEnumerable<T> collection) => collection ?? Enumerable.Empty<T>();
+        public static IEnumerable<T> ToEmptyIfNull<T>(IEnumerable<T> collection) => collection ?? Enumerable.Empty<T>();
     }
 
     // Задание 97: Логирование с использованием ?? для сообщений
-    public static class NullSafeLogger
+    public static class LoggingNullCoalescing
     {
         public static void LogInfo(string message, string category = null)
         {
-            string logMessage = $"[{category ?? "General"}] {message ?? "No message"}";
-            Console.WriteLine(logMessage);
+            var logMessage = $"[{category ?? "General"}] {message ?? "No message"}";
+            Console.WriteLine($"LOG: {logMessage}");
         }
     }
 
     // Задание 98: Пример ?? при работе с базой данных
     public static class DatabaseNullCoalescing
     {
-        public class DatabaseRecord { public string Name { get; set; } public int? Age { get; set; } }
-        public static string GetRecordDisplay(DatabaseRecord record) => $@"
-Name: {record?.Name ?? "Unknown"}
-Age: {record?.Age?.ToString() ?? "Not specified"}";
+        public class DatabaseRecord
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public DateTime? CreatedDate { get; set; }
+        }
+
+        public static void ProcessRecord(DatabaseRecord record)
+        {
+            var name = record?.Name ?? "Unknown";
+            var description = record?.Description ?? "No description";
+            var created = record?.CreatedDate ?? DateTime.Now;
+            Console.WriteLine($"Запись: {name}, {description}, создано: {created}");
+        }
     }
 
     // Задание 99: Использование ?? в конструкторах классов
@@ -925,60 +1525,25 @@ Age: {record?.Age?.ToString() ?? "Not specified"}";
     {
         private string _name;
         private List<int> _numbers;
+
         public SmartClass(string name, List<int> numbers)
         {
             _name = name ?? "Default Name";
             _numbers = numbers ?? new List<int> { 1, 2, 3 };
         }
-    }
 
-    // Задание 100: Метод для валидации и установки значений через ??
-    public static class ValidationAndAssignment
-    {
-        public static bool TrySetValue<T>(ref T field, T newValue, T defaultValue = default) where T : class
+        public void Display()
         {
-            field = newValue ?? defaultValue;
-            return newValue != null;
+            Console.WriteLine($"Name: {_name}, Numbers: [{string.Join(", ", _numbers)}]");
         }
     }
 
-    // ==================== ОСНОВНОЙ КОД ДЛЯ ДЕМОНСТРАЦИИ ====================
-
-    class Program
+    // Задание 100: Метод для валидации и установки значений через ??
+    public static class ValidationNullCoalescing
     {
-        static void Main(string[] args)
+        public static T ValidateAndSet<T>(T value, Func<T, bool> validator, T defaultValue) where T : class
         {
-            Console.WriteLine(" РЕАЛИЗАЦИЯ ЗАДАЧ ПО GENERICS, VARIANCE, NULLABLE И NULL-COALESCING\n");
-
-            // Демонстрация Generics
-            Console.WriteLine("=== GENERICS ДЕМО ===");
-            var stack = new Stack<int>();
-            stack.Push(1); stack.Push(2); stack.Push(3);
-            stack.Display();
-            Console.WriteLine($"Pop: {stack.Pop()}");
-            stack.Display();
-
-            var (min, max) = MinMaxFinder.FindMinMax(new[] { 5, 2, 8, 1, 9 });
-            Console.WriteLine($"Min: {min}, Max: {max}");
-
-            // Демонстрация Variance
-            Console.WriteLine("\n=== VARIANCE ДЕМО ===");
-            IEnumerable<Dog> dogs = new List<Dog> { new Dog { Name = "Rex" } };
-            IEnumerable<Animal> animals = dogs;
-            Console.WriteLine("Ковариантность работает!");
-
-            // Демонстрация Nullable
-            Console.WriteLine("\n=== NULLABLE ДЕМО ===");
-            int? nullableInt = null;
-            Console.WriteLine($"Nullable int: {nullableInt?.ToString() ?? "null"}");
-            Console.WriteLine($"With default: {nullableInt ?? 100}");
-
-            // Демонстрация Null-coalescing
-            Console.WriteLine("\n=== NULL-COALESCING ДЕМО ===");
-            string test = null;
-            Console.WriteLine($"Result: {test ?? "Default Value"}");
-
-            Console.ReadLine();
+            return (value != null && validator(value)) ? value : defaultValue;
         }
     }
 }

@@ -350,7 +350,7 @@ public class Container : IServiceProvider
 
     public Container()
     {
-        // Регистрируем сам контейнер
+        // Регистрируем контейнер
         _registrations[typeof(Container)] = new ServiceRegistration(typeof(Container), typeof(Container), Lifecycle.Singleton);
         _registrations[typeof(IServiceProvider)] = new ServiceRegistration(typeof(IServiceProvider), typeof(Container), Lifecycle.Singleton);
         _singletons[typeof(Container)] = this;
@@ -385,7 +385,7 @@ public class Container : IServiceProvider
 
     public object GetService(Type serviceType)
     {
-        // Проверяем циклические зависимости
+
         if (_currentResolutionStack.Contains(serviceType))
         {
             throw new InvalidOperationException($"Circular dependency detected for type {serviceType.Name}");
@@ -407,14 +407,14 @@ public class Container : IServiceProvider
 
     private object ResolveService(Type serviceType)
     {
-        // Если запрашиваем контейнер
+
         if (serviceType == typeof(Container) || serviceType == typeof(IServiceProvider))
             return this;
 
         // Ищем регистрацию
         if (!_registrations.TryGetValue(serviceType, out var registration))
         {
-            // Попробуем зарегистрировать автоматически, если это конкретный тип
+
             if (serviceType.IsClass && !serviceType.IsAbstract)
             {
                 registration = new ServiceRegistration(serviceType, serviceType, Lifecycle.Transient);
@@ -437,7 +437,7 @@ public class Container : IServiceProvider
 
     private object GetOrCreateSingleton(ServiceRegistration registration)
     {
-        // Для синглтонов используем родительский контейнер, если есть
+
         var targetContainer = _parent ?? this;
 
         lock (targetContainer._singletons)
@@ -453,7 +453,7 @@ public class Container : IServiceProvider
 
     private object GetOrCreateScoped(ServiceRegistration registration)
     {
-        // Scoped instances хранятся в текущем контейнере
+
         lock (_scopedInstances)
         {
             if (!_scopedInstances.TryGetValue(registration.InterfaceType, out var instance))
@@ -677,7 +677,7 @@ class Program
 
     static void TestGUIFactory()
     {
-        // Тестируем разные фабрики
+
         var factories = new IGUIFactory[]
         {
             new WindowsFactory(),
@@ -704,7 +704,7 @@ class Program
     {
         var container = new Container();
 
-        // Регистрируем сервисы с разными жизненными циклами
+
         container.Register<IRepository<User>, UserRepository>(Lifecycle.Singleton);
         container.Register<IRepository<Product>, ProductRepository>(Lifecycle.Transient);
         container.Register<IUserService, UserService>(Lifecycle.Scoped);
@@ -713,24 +713,24 @@ class Program
 
         Console.WriteLine("=== Тестирование внедрения зависимостей ===");
 
-        // Получаем сервисы
+
         var userService = container.GetService<IUserService>();
         var productService = container.GetService<IProductService>();
         var orderService = container.GetService<IOrderService>();
 
-        // Используем сервисы
+
         userService.CreateUser("John Doe");
         productService.CreateProduct("Laptop", 999.99m);
         orderService.CreateOrder(1, 1);
 
         Console.WriteLine("\n=== Тестирование жизненных циклов ===");
 
-        // Singleton должен быть тем же экземпляром
+
         var repo1 = container.GetService<IRepository<User>>();
         var repo2 = container.GetService<IRepository<User>>();
         Console.WriteLine($"Singleton repositories are same: {repo1 == repo2}");
 
-        // Transient должны быть разными экземплярами
+
         var productRepo1 = container.GetService<IRepository<Product>>();
         var productRepo2 = container.GetService<IRepository<Product>>();
         Console.WriteLine($"Transient repositories are same: {productRepo1 == productRepo2}");
@@ -760,7 +760,7 @@ class Program
         }
 
         Console.WriteLine("\n=== Тестирование сложных зависимостей ===");
-        // Создаем дополнительные сервисы для демонстрации
+
         container.Register<EmailService>(Lifecycle.Transient);
         container.Register<NotificationService>(Lifecycle.Scoped);
 
@@ -798,4 +798,5 @@ public class NotificationService
         _emailService.SendEmail(email, "Welcome to our service!");
         Console.WriteLine("Welcome notification sent");
     }
+
 }
